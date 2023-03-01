@@ -35,11 +35,9 @@ class ELITELOGGER_API UDebugSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
-
 public:
-
-	
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Deinitialize() override;
 
 	UFUNCTION(BlueprintPure, Category="Elite Logger")
 	FTrackedPackage GetTrackedVariablesList(const UObject* Object);
@@ -59,9 +57,6 @@ public:
 	UFUNCTION(BlueprintCallable,meta = (DisplayName = "Track An Object", DevelopmentOnly), Category="Elite Logger")
 	void TrackAnObject(UObject* ObjectToTrack, const FName VariableName, UObject* Value);
 
-
-
-
 	// Internal Setters For Blueprint Node call these directly in C++
 	UFUNCTION(meta=(DevelopmentOnly))
 	void AddTrackedVariable_Bool(UObject* Target, const FName& VariableName, const bool Value);
@@ -78,25 +73,14 @@ public:
 	UFUNCTION(meta=(DevelopmentOnly))
 	void AddTrackedVariable_Object(UObject* Target, const FName& VariableName, UObject* Value);
 
-
-protected:
-
-	
-	
-	
-	
-
-	
+	void ShowEliteDebugWidget();
 
 private:
-
 	UPROPERTY()
 	TMap<TObjectPtr<UObject>, FTrackedPackage> TrackedVariables;
 
+	UPROPERTY()
+	TObjectPtr<UUserWidget> SpawnedWidget;
 
-
-
-
-	
-
+	IConsoleObject* ShowDebugWidgetCommand = nullptr;
 };
