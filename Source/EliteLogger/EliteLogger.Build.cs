@@ -52,6 +52,7 @@ public class EliteLogger : ModuleRules
 				"PropertyEditor",
 				"ToolMenus",
 				"AssetTools",
+				"DeveloperSettings",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

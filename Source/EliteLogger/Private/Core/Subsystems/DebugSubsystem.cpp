@@ -1,11 +1,25 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Core/Subsystems/DebugSubsystem.h"
 
-void UDebugSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+#include "Blueprint/UserWidget.h"
+#include "Core/Settings/EliteDebuggerSettings.h"
+
+void UDebugSubsystem::Initialize(FSubsystemCollectionBase &Collection)
 {
 	Super::Initialize(Collection);
+
+	ShowDebugWidgetCommand = IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("ShowEliteDebugWidget"), TEXT("Shows the EliteDebug Widget"),
+		FConsoleCommandDelegate::CreateUObject(this, &ThisClass::ShowEliteDebugWidget),
+		ECVF_Default);
+}
+
+void UDebugSubsystem::Deinitialize()
+{
+	Super::Deinitialize();
+
+	IConsoleManager::Get().UnregisterConsoleObject( ShowDebugWidgetCommand );
 }
 
 
@@ -158,5 +172,23 @@ void UDebugSubsystem::AddTrackedVariable_Object(UObject* Target, const FName& Va
 	
 }
 
+void UDebugSubsystem::ShowEliteDebugWidget()
+{
+#if !UE_BUILD_SHIPPING
+	const TSubclassOf<UUserWidget> DebugWidget = GetDefault<UEliteDebuggerSettings>()->DebugWidget;
 
-
+	if (SpawnedWidget == nullptr && DebugWidget != nullptr)
+	{
+		SpawnedWidget = CreateWidget<UUserWidget>(GetWorld(), DebugWidget);
+		SpawnedWidget->AddToViewport();
+	}
+	else
+	{
+		if (SpawnedWidget != nullptr && SpawnedWidget->IsVisible())
+		{
+			SpawnedWidget->RemoveFromParent();
+			SpawnedWidget = nullptr;
+		}
+	}
+#endif
+}
